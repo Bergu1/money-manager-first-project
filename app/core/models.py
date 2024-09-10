@@ -6,11 +6,14 @@ from django.contrib.auth.models import (
 )
 import uuid
 
+
 class PersonManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
-        person = self.model(username=username, email=self.normalize_email(email), **extra_fields)
+        person = self.model(username=username,
+                            email=self.normalize_email(email),
+                            **extra_fields)
         person.set_password(password)
         person.save(using=self._db)
 

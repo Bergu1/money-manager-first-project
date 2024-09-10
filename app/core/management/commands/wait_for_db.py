@@ -5,6 +5,7 @@ from psycopg2 import OperationalError as Psycopg2OpError
 
 from django.db.utils import OperationalError
 
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
         pass

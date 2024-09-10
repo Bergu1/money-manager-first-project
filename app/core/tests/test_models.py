@@ -24,12 +24,16 @@ class ModelTests(TestCase):
             ['test4@example.COM', 'test4@example.com'],
         ]
         for idx, (email, expected) in enumerate(sample_emails):
-            user = get_user_model().objects.create_user(username=f'testuser{idx}', email=email, password='sample123')
+            user = get_user_model().objects.create_user(username=f'testuser{idx}', 
+                                                        email=email, 
+                                                        password='sample123')
             self.assertEqual(user.email, expected)
-    
+
     def test_new_user_without_email_raises_error(self):
         with self.assertRaises(ValueError):
-            get_user_model().objects.create_user(username='testuser', email='', password='test123')
+            get_user_model().objects.create_user(username='testuser', 
+                                                 email='', 
+                                                 password='test123')
 
     def test_create_superuser(self):
         user = get_user_model().objects.create_superuser(
