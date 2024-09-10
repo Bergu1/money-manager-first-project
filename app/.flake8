@@ -1,0 +1,9 @@
+
+
+[flake8]
+# improve our quality of code
+exclude = 
+    migrations,
+    __pycache__,
+    manage.py,
+    settings.py

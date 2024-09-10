@@ -29,7 +29,7 @@ class Person(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    username = models.CharField(max_length=30, unique=True)
+    username = models.CharField(max_length=80, unique=True)
     email = models.EmailField(unique=True)
     date_of_birth = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
