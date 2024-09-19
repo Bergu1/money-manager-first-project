@@ -144,7 +144,7 @@ class Account(models.Model):
 
 
 class AccountHistory(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, default=0)
     date = models.DateField()
     added_funds = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)

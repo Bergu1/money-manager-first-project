@@ -36,6 +36,7 @@ def show_deposit(request):
                 month=ExtractMonth('date'),
                 year=ExtractYear('date')
             ).filter(
+                account=request.user.account,
                 year=year,
                 month=month,
                 added_funds__gt=0  

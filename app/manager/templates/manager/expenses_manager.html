@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Expenses</title>
+</head>
+<body>
+    <header>
+        <h1>Money Manager - Summary of Expenses</h1>
+        <p>Manage your food expenses effortlessly</p>
+        <div>
+            <a href="{% url 'logout' %}" class="logout-button">Log Out</a>
+        </div>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="{% url 'mainPage' %}">Home</a></li>
+            <li>
+                <a>Expenses</a>
+                <ul>
+                    <li><a href="{% url 'bills' %}">Bills</a></li>
+                    <li><a href="{% url 'daily_buy' %}">Daily Buy</a></li>
+                    <li><a href="{% url 'random_expenses' %}">Random Expenses</a></li>
+                </ul>
+            </li>
+            <li>
+                <a>Manager</a>
+                <ul>
+                    <li><a href="{% url 'expenses_manager' %}">Check your expenses</a></li>
+                    <li><a href="{% url 'savings_manager' %}">Check how much you have saved</a></li>
+                </ul>
+            </li>
+            <li><a href="{% url 'account' %}">Account</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Select Date to View Purchases</h2>
+        <form method="POST" action="{% url 'expenses_manager' %}">
+            {% csrf_token %}
+            <label for="date">Select Date:</label>
+            <input type="date" id="date" name="date" required>
+            <button type="submit">Show Purchases</button>
+        </form>
+
+        <div id="purchase-records">
+            <h3>Daily buy purchases: </h3>
+            {% if purchases %}
+                <ul>
+                    {% for purchase in purchases %}
+                        <li>{{ purchase.date }} - {{ purchase.product }} - {{ purchase.shop }} - ${{ purchase.price }}:</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No purchases found for the selected date.</p>
+            {% endif %}
+            <h3>Bills purchases: </h3>
+                {% if purchases2 %}
+                <ul>
+                    {% for purchase in purchases2 %}
+                        <li>{{ purchase.date }} - {{ purchase.fee }} - ${{ purchase.price }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No purchases found for the selected date.</p>
+            {% endif %}
+            <h3>Random purchases: </h3>
+            {% if purchases3 %}
+                <ul>
+                    {% for purchase in purchases3 %}
+                        <li>{{ purchase.date }} - {{ purchase.for_what }} - ${{ purchase.price }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No purchases found for the selected date.</p>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>
