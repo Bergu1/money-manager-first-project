@@ -13,11 +13,20 @@ class PersonRegistrationForm(forms.ModelForm):
         model = Person
         fields = ['first_name', 'last_name', 'username', 'email', 'date_of_birth', 'password']
         extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
-
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+        }
 
     def save(self, commit=True):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data['password'])
+        user = Person.objects.create_user(
+            username=self.cleaned_data['username'],
+            email=self.cleaned_data['email'],
+            password=self.cleaned_data['password'],
+            first_name=self.cleaned_data['first_name'],
+            last_name=self.cleaned_data['last_name'],
+            date_of_birth=self.cleaned_data.get('date_of_birth')
+        )
+        
         if commit:
             user.save()
         return user
@@ -58,6 +67,7 @@ class PersonLoginForm(forms.Form):
 
 class CustomPasswordResetForm(PasswordResetForm):
     email = forms.EmailField(label=_("Email"), max_length=254)
+
 
 class SetPasswordForm(SetPasswordForm):
     new_password1 = forms.CharField(

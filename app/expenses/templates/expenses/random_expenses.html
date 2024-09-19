@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Random Buy expenses</title>
+</head>
+<body>
+    <header>
+        <h1>Money Manager - Random Buy</h1>
+        <p>Manage your food expenses effortlessly</p>
+    </header>
+    <div>
+        <a href="{% url 'logout' %}">Log Out</a>
+    </div>
+    <nav>
+        <ul>
+            <li><a href="{% url 'mainPage' %}"a>Home</a></li>
+            <li>
+                <a>Expenses</a>
+                <ul>
+                    <li><a href="{% url 'bills' %}">Bills</a></li>
+                    <li><a href="{% url 'daily_buy' %}">Daily Buy</a></li>
+                    <li><a href="{% url 'random_expenses' %}">Random Expenses</a></li>
+                </ul>
+            </li>
+            <li>
+                <a>Manager</a>
+                <ul>
+                    <li><a>Check your expenses</a></li>
+                    <li><a>Check how much you have saved</a></li>
+                </ul>
+            </li>
+            <li><a href="{% url 'account' %}">Account</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Add your random expenses you made</h2>
+        <form method="post">
+            {% csrf_token %}
+            <label for="date">Add Date:</label>
+            <input type="date" id="date" name="date"><br>
+            <label for="for_what">Add what you spent money on:</label>
+            <input type="text" id="for_what" name="for_what"><br>
+            <label for="price">Add Cost:</label>
+            <input type="number" id="price" name="price" step="0.01"><br>
+            <button type="submit">Add Record</button>
+        </form>
+    </main>
+</body>
+</html>

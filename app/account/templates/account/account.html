@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Account</title>
+</head>
+<body>
+    <header>
+        <h1>Money Manager - Account</h1>
+        <div>
+            <a href="{% url 'logout' %}" class="logout-button">Log Out</a>
+        </div>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="{% url 'mainPage' %}">Home</a></li>
+            <li>
+                <a>Expenses</a>
+                <ul>
+                    <li><a href="{% url 'bills' %}">Bills</a></li>
+                    <li><a href="{% url 'daily_buy' %}">Daily Buy</a></li>
+                    <li><a href="{% url 'random_expenses' %}">Random Expenses</a></li>
+                </ul>
+            </li>
+            <li>
+                <a>Manager</a>
+                <ul>
+                    <li><a>Check your expenses</a></li>
+                    <li><a>Check how much you have saved</a></li>
+                </ul>
+            </li>
+            <li><a href="{% url 'account' %}">Account</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Your Balance: ${{ total_balance }}</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="added_funds">Amount:</label>
+            <input type="number" id="added_funds" name="added_funds" required>
+
+            <label for="source">Source:</label>
+            <input type="text" id="source" name="source" required>
+
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+
+            <button type="submit">Add Money</button>
+            <li><a href="{% url 'show_deposit' %}">If you what to check your deposite click here!</a></li>
+        </form>
+    </main>
+</body>
+</html>

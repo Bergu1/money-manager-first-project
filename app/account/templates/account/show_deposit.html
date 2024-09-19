@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Show Deposit</title>
+</head>
+<body>
+    <header>
+        <h1>Money Manager - Summary of Deposit</h1>
+        <p>Manage your food expenses effortlessly</p>
+        <div class="logout-container">
+            <a href="{% url 'logout' %}" class="logout-button">Log Out</a>
+        </div>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="{% url 'mainPage' %}">Home</a></li>
+            <li>
+                <a>Expenses</a>
+                <ul>
+                    <li><a href="{% url 'bills' %}">Bills</a></li>
+                    <li><a href="{% url 'daily_buy' %}">Daily Buy</a></li>
+                    <li><a href="{% url 'random_expenses' %}">Random Expenses</a></li>
+                </ul>
+            </li>
+            <li>
+                <a>Manager</a>
+                <ul>
+                    <li><a>Check your expenses</a></li>
+                    <li><a>Check how much you have saved</a></li>
+                </ul>
+            </li>
+            <li><a href="{% url 'account' %}">Account</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Select Date to Deposits</h2>
+        <form method="POST" action="{% url 'show_deposit' %}">
+            {% csrf_token %}
+            <label for="month">Select Month:</label>
+            <input type="text" id="month" name="month">
+            <label for="year">Select Year:</label>
+            <input type="text" id="year" name="year">
+            <button type="submit">Show Deposits</button>
+        </form>
+
+        <div>
+            <h3>Deposits on Selected Date</h3>
+            {% if deposits %}
+                <ul>
+                    {% for deposit in deposits %}
+                        <li>{{ deposit.added_funds }} - {{ deposit.source }} - {{ deposit.date }}: ${{ deposit.total_balance }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No deposits found for the selected date.</p>
+            {% endif %}
+        </div>
+        
+    </main>
+</body>
+</html>
