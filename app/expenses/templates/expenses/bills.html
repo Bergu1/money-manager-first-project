@@ -30,8 +30,16 @@
                 </ul>
             </li>
             <li><a href="{% url 'account' %}">Account</a></li>
+            <li>
+                <a>Money Box</a>
+                <ul>
+                    <li><a href="{% url 'transfer_to_savings' %}">Transfer money to money box</a></li>
+                    <li><a href="{% url 'set_savings_goal' %}">Set a savings goal</a></li>
+                </ul>
+            </li>
         </ul>
     </nav>
+    <h1>------------------------------------------------------------------------</h1>
     <main>
         <h2>Add bills what you have already paid or what you are going to pay.</h2>
         <form method="post">

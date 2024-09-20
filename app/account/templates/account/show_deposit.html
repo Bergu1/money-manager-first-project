@@ -30,10 +30,19 @@
                 </ul>
             </li>
             <li><a href="{% url 'account' %}">Account</a></li>
+            <li>
+                <a>Money Box</a>
+                <ul>
+                    <li><a href="{% url 'transfer_to_savings' %}">Transfer money to money box</a></li>
+                    <li><a href="{% url 'set_savings_goal' %}">Set a savings goal</a></li>
+                </ul>
+            </li>
         </ul>
     </nav>
+    <h1>------------------------------------------------------------------------</h1>
     <main>
-        <h2>Select Date to Deposits</h2>
+        <h2>You can select a date and check how much money was transferred to your account on that day.</h2>
+        <h3>Select Date:</h3>
         <form method="POST" action="{% url 'show_deposit' %}">
             {% csrf_token %}
             <label for="month">Select Month:</label>
@@ -48,7 +57,7 @@
             {% if deposits %}
                 <ul>
                     {% for deposit in deposits %}
-                        <li>{{ deposit.added_funds }} - {{ deposit.source }} - {{ deposit.date }}: ${{ deposit.total_balance }}</li>
+                        <li>{{ deposit.added_funds }} {{ currency }}- {{ deposit.source }} - {{ deposit.date }}: {{ deposit.total_balance }} {{ currency }}</li>
                     {% endfor %}
                 </ul>
             {% else %}

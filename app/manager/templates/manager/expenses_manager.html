@@ -32,8 +32,10 @@
             <li><a href="{% url 'account' %}">Account</a></li>
         </ul>
     </nav>
+    <h1>------------------------------------------------------------------------</h1>
     <main>
-        <h2>Select Date to View Purchases</h2>
+        <h2>You can check how much money and on what you spent on a selected day.</h2>
+        <h3>Select Date to View Purchases:</h3>
         <form method="POST" action="{% url 'expenses_manager' %}">
             {% csrf_token %}
             <label for="date">Select Date:</label>
@@ -46,7 +48,7 @@
             {% if purchases %}
                 <ul>
                     {% for purchase in purchases %}
-                        <li>{{ purchase.date }} - {{ purchase.product }} - {{ purchase.shop }} - ${{ purchase.price }}:</li>
+                        <li>{{ purchase.date }} - {{ purchase.product }} - {{ purchase.shop }} - {{ purchase.price }} {{ currency }}</li>
                     {% endfor %}
                 </ul>
             {% else %}
@@ -56,7 +58,7 @@
                 {% if purchases2 %}
                 <ul>
                     {% for purchase in purchases2 %}
-                        <li>{{ purchase.date }} - {{ purchase.fee }} - ${{ purchase.price }}</li>
+                        <li>{{ purchase.date }} - {{ purchase.fee }} - {{ purchase.price }} {{ currency }}</li>
                     {% endfor %}
                 </ul>
             {% else %}
@@ -66,7 +68,7 @@
             {% if purchases3 %}
                 <ul>
                     {% for purchase in purchases3 %}
-                        <li>{{ purchase.date }} - {{ purchase.for_what }} - ${{ purchase.price }}</li>
+                        <li>{{ purchase.date }} - {{ purchase.for_what }} - {{ purchase.price }} {{ currency }}</li>
                     {% endfor %}
                 </ul>
             {% else %}

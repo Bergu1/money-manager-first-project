@@ -31,8 +31,27 @@
                 </ul>
             </li>
             <li><a href="{% url 'account' %}">Account</a></li>
+            <li>
+                <a>Money Box</a>
+                <ul>
+                    <li><a href="{% url 'transfer_to_savings' %}">Transfer money to money box</a></li>
+                    <li><a href="{% url 'set_savings_goal' %}">Set a savings goal</a></li>
+                </ul>
+            </li>
         </ul>
     </nav>
+    <div>
+        <form method="post" action="{% url 'set_currency' %}">
+            {% csrf_token %}
+            <label for="currency">Choose your currency:</label>
+            <select name="currency" id="currency">
+                <option value="USD" {% if request.user.currency == "USD" %}selected{% endif %}>USD</option>
+                <option value="EUR" {% if request.user.currency == "EUR" %}selected{% endif %}>EUR</option>
+                <option value="PLN" {% if request.user.currency == "PLN" %}selected{% endif %}>PLN</option>
+            </select>
+            <button type="submit">Set Currency</button>
+        </form>
+    </div>
 </body>
 
 </html>

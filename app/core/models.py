@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import uuid
 from django.utils import timezone
+from decimal import Decimal
+import requests
 
 
 class PersonManager(BaseUserManager):
@@ -41,6 +43,8 @@ class Person(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     account = models.OneToOneField('Account', on_delete=models.CASCADE, null=True, blank=True)
+    currency = models.CharField(max_length=3, default='USD')
+
 
     objects = PersonManager()
 
@@ -50,6 +54,48 @@ class Person(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
+
+
+    def get_exchange_rate(self, base_currency, target_currency):
+        api_key = 'f193fd51d73d8997215547c8'
+        url = f"https://v6.exchangerate-api.com/v6/f193fd51d73d8997215547c8/latest/USD"
+        response = requests.get(url)
+        data = response.json()
+        return Decimal(data['conversion_rates'].get(target_currency, 1))
+
+
+    def get_exchange_rate_write(self, base_currency, target_currency):
+        api_key = 'f193fd51d73d8997215547c8'
+        url = f"https://v6.exchangerate-api.com/v6/f193fd51d73d8997215547c8/latest/USD"
+        response = requests.get(url)
+        data = response.json()
+        rate = Decimal(data['conversion_rates'].get(target_currency, 1))
+        if target_currency == 'USD':
+            return rate
+        else:
+            return 1 / rate
+
+
+    def convert_price(self, price, user_currency):
+        base_currency = 'USD'
+        if user_currency != base_currency:
+            rate = self.get_exchange_rate(base_currency, user_currency)
+            rate = Decimal(rate)
+            return price * rate
+        return price
+
+
+    def convert_price_write(self, price, user_currency):
+        base_currency = 'USD'
+        if user_currency != base_currency:
+            rate = self.get_exchange_rate_write(base_currency, user_currency)
+            rate = Decimal(rate)
+            return price * rate
+        return price
+
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'
 
 
 class DailyBuy(models.Model):
@@ -153,3 +199,13 @@ class AccountHistory(models.Model):
 
     def __str__(self):
         return f'History for Account on {self.date} - Balance: {self.total_balance}'
+    
+
+class SavingsGoal(models.Model):
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    target_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    current_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Savings Goal"

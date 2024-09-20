@@ -1,12 +1,8 @@
 from django.shortcuts import render, redirect
-from django.template import loader
 from .forms import DailyBuyForm, RandomExpensesForm, BillsForm
-from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
-from django.db.models.functions import ExtractMonth, ExtractYear
-from django.template.loader import get_template
-from core.models import Account
+
+
 
 
 @login_required
@@ -17,6 +13,7 @@ def daily_buy(request):
         if form.is_valid():
             daily_buy = form.save(commit=False)
             daily_buy.person = request.user
+            daily_buy.price = request.user.convert_price_write(daily_buy.price, request.user.currency)
             daily_buy.save()
             account.update_balance(daily_buy.price, "subtract")
             return redirect('daily_buy')
@@ -34,6 +31,7 @@ def bills(request):
         if form.is_valid():
             bills = form.save(commit=False)
             bills.person = request.user
+            bills.price = request.user.convert_price_write(bills.price, request.user.currency)
             bills.save()
             account.update_balance(bills.price, "subtract")
             return redirect('bills')
@@ -50,7 +48,8 @@ def random_expenses(request):
         form = RandomExpensesForm(request.POST)
         if form.is_valid():
             random_expenses = form.save(commit=False)
-            random_expenses.person = request.user 
+            random_expenses.person = request.user
+            random_expenses.price = request.user.convert_price_write(random_expenses.price, request.user.currency)
             random_expenses.save()
             account.update_balance(random_expenses.price, "subtract")
             return redirect('random_expenses')

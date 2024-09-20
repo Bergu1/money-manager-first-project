@@ -7,12 +7,13 @@ from core.models import AccountHistory
 @login_required
 def account(request):
     account = request.user.account
-
+    currency = request.user.currency
     if request.method == 'POST':
         form = AccountForm(request.POST, instance=account)  
         if form.is_valid():
             added_funds = form.cleaned_data['added_funds']
             if added_funds > 0:
+                account.added_funds = request.user.convert_price_write(added_funds, currency)
                 account.update_balance(added_funds, "add")
                 account.added_funds = 0
             return redirect('account')
@@ -20,8 +21,8 @@ def account(request):
             print(form.errors)
     else:
         form = AccountForm(instance=account)
-
-    return render(request, 'account/account.html', {'form': form, 'total_balance': account.total_balance})
+    account.total_balance_display = round(request.user.convert_price(account.total_balance, currency), 2)
+    return render(request, 'account/account.html', {'form': form, 'total_balance': account.total_balance_display, 'currency': currency})
 
 
 
@@ -41,5 +42,8 @@ def show_deposit(request):
                 month=month,
                 added_funds__gt=0  
             )
+            for deposite in deposits:
+                deposite.added_funds = round(request.user.convert_price(deposite.added_funds, request.user.currency), 2)
+                deposite.total_balance = round(request.user.convert_price(deposite.total_balance, request.user.currency), 2)
 
-    return render(request, 'account/show_deposit.html', {'deposits': deposits})
+    return render(request, 'account/show_deposit.html', {'deposits': deposits, 'currency': request.user.currency})

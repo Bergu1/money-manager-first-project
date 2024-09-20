@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Daily Buy expenses</title>
+    <title>Savings goal</title>
 </head>
 <body>
     <header>
-        <h1>Money Manager - Daily Buy</h1>
+        <h1>Money Manager - Savings goal</h1>
         <p>Manage your food expenses effortlessly</p>
         <div>
             <a href="{% url 'logout' %}">Log Out</a>
@@ -40,30 +40,11 @@
         </ul>
     </nav>
     <h1>------------------------------------------------------------------------</h1>
-    <main>
-        <h2>What have you bought today?</h2>
-        <form method="post">
-            {% csrf_token %}
-            <label for="day">Add Day:</label>
-            <select id="day" name="day">
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-                <option value="Saturday">Saturday</option>
-                <option value="Sunday">Sunday</option>
-            </select><br>
-            <label for="date">Add Date:</label>
-            <input type="date" id="date" name="date"><br>
-            <label for="shop">Add Shop:</label>
-            <input type="text" id="shop" name="shop"><br>
-            <label for="product">Add Product:</label>
-            <input type="text" id="product" name="product"><br>
-            <label for="price">Add Price:</label>
-            <input type="number" id="price" name="price" step="0.01"><br>
-            <button type="submit">Add Record</button>
-        </form>
-    </main>
+    <h1>Your savings goal!</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Set a savings goal ({{ currency }})</button>
+    </form>
 </body>
 </html>

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'expenses',
     'account',
     'manager',
+    'moneybox',
 ]
 
 MIDDLEWARE = [

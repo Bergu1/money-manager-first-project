@@ -33,6 +33,8 @@ def savings_manager(request):
             )
 
             total_expenses0 = deposit.aggregate(total=Sum('added_funds'))['total'] or 0
+            total_expenses0 = user.convert_price(total_expenses0, user.currency)
+            total_expenses0 = round(total_expenses0, 2)
 
             expenses1 = DailyBuy.objects.annotate(
                 month=ExtractMonth('date'),
@@ -44,6 +46,7 @@ def savings_manager(request):
             )
 
             total_expenses1 = expenses1.aggregate(total=Sum('price'))['total'] or 0
+            total_expenses1 = user.convert_price(total_expenses1, user.currency)
 
             expenses2 = Bills.objects.annotate(
                 month=ExtractMonth('date'),
@@ -55,6 +58,7 @@ def savings_manager(request):
             )
 
             total_expenses2 = expenses2.aggregate(total=Sum('price'))['total'] or 0
+            total_expenses2 = user.convert_price(total_expenses2, user.currency)
 
             expenses3 = Random_expenses.objects.annotate(
                 month=ExtractMonth('date'),
@@ -65,31 +69,54 @@ def savings_manager(request):
                 month=month, 
             )
 
+            for transaction in deposit:
+                transaction.added_funds = round(user.convert_price(transaction.added_funds, user.currency), 2)
+                transaction.total_balance = round(user.convert_price(transaction.total_balance, user.currency), 2)
+
+            for expense in expenses1:
+                expense.price = round(user.convert_price(expense.price, user.currency), 2)
+            
+            for expense in expenses2:
+                expense.price = round(user.convert_price(expense.price, user.currency), 2)
+            
+            for expense in expenses3:
+                expense.price = round(user.convert_price(expense.price, user.currency), 2)
+
             total_expenses3 = expenses3.aggregate(total=Sum('price'))['total'] or 0
+            total_expenses3 = user.convert_price(total_expenses3, user.currency)
 
             expenses = total_expenses1 + total_expenses2 + total_expenses3
+            expenses = round(expenses, 2)
 
-    return render(request, 'manager/savings_manager.html', {'deposits' : deposit, 
-                                                            'expenses1' : expenses1, 
-                                                            'expenses2' : expenses2, 
-                                                            'expenses3' : expenses3, 
-                                                            'expenses' : expenses, 
-                                                            'total_expenses0' : total_expenses0})
+    return render(request, 'manager/savings_manager.html', {'deposits' : deposit, 'expenses1' : expenses1, 'expenses2' : expenses2,
+                                                     'expenses3' : expenses3, 'expenses' : expenses, 'total_expenses0' : total_expenses0,
+                                                       'currency': user.currency})
 
 
 @login_required
 def purchase_list(request):
+    user = request.user
     purchases = None
     purchases2 = None
     purchases3 = None
     if request.method == 'POST':
         date = request.POST.get('date')
         if date:
-            purchases = DailyBuy.objects.filter(date=date, person=request.user)
-            purchases2 = Bills.objects.filter(date=date, person=request.user)
-            purchases3 = Random_expenses.objects.filter(date=date, person=request.user)
+            purchases = DailyBuy.objects.filter(date=date, person=user)
+            purchases2 = Bills.objects.filter(date=date, person=user)
+            purchases3 = Random_expenses.objects.filter(date=date, person=user)
 
-    return render(request, 'manager/expenses_manager.html', {'purchases': purchases, 'purchases2': purchases2, 'purchases3': purchases3})
+            for expense in purchases:
+                expense.price = round(user.convert_price(expense.price, user.currency), 2)
+            
+            for expense in purchases2:
+                expense.price = round(user.convert_price(expense.price, user.currency), 2)
+            
+            for expense in purchases3:
+                expense.price = round(user.convert_price(expense.price, user.currency), 2)
+
+    return render(request, 'manager/expenses_manager.html', {'purchases': purchases, 'purchases2': purchases2,
+                                                              'purchases3': purchases3, 'currency': user.currency})
 
 
 
@@ -119,8 +146,8 @@ def generate_pdf(request):
         added_funds__gt=0  
     )
     total_deposits = deposits.aggregate(total=Sum('added_funds'))['total'] or 0
+    total_deposits = round(person.convert_price(total_deposits, person.currency), 2)
 
-    # Pobranie wszystkich wydatków
     expenses1 = DailyBuy.objects.annotate(
         month=ExtractMonth('date'),
         year=ExtractYear('date')
@@ -130,6 +157,7 @@ def generate_pdf(request):
         month=month, 
     )
     total_expenses1 = expenses1.aggregate(total=Sum('price'))['total'] or 0
+    total_expenses1 = person.convert_price(total_expenses1, person.currency)
 
     expenses2 = Bills.objects.annotate(
         month=ExtractMonth('date'),
@@ -140,6 +168,7 @@ def generate_pdf(request):
         month=month, 
     )
     total_expenses2 = expenses2.aggregate(total=Sum('price'))['total'] or 0
+    total_expenses2 = person.convert_price(total_expenses2, person.currency)
 
     expenses3 = Random_expenses.objects.annotate(
         month=ExtractMonth('date'),
@@ -150,8 +179,8 @@ def generate_pdf(request):
         month=month, 
     )
     total_expenses3 = expenses3.aggregate(total=Sum('price'))['total'] or 0
-
-    total_expenses = total_expenses1 + total_expenses2 + total_expenses3
+    total_expenses3 = person.convert_price(total_expenses3, person.currency)
+    total_expenses = round(total_expenses1 + total_expenses2 + total_expenses3, 2)
 
     context = {
         'person': person,
@@ -178,3 +207,14 @@ def generate_pdf(request):
     if pisa_status.err:
         return HttpResponse('An error occurred while generating the PDF', status=500)
     return response
+
+
+@login_required
+def set_currency(request):
+    if request.method == 'POST':
+        currency = request.POST.get('currency')
+        request.user.currency = currency
+        request.user.save()
+        return redirect('mainPage')
+    else:
+        return redirect('mainPage')

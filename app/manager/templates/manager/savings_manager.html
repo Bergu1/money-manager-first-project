@@ -32,8 +32,10 @@
             <li><a href="{% url 'account' %}">Account</a></li>
         </ul>
     </nav>
+    <h1>------------------------------------------------------------------------</h1>
     <main>
-        <h2>Select the month you want to check</h2>
+        <h2>You can check how much you have paid in a given month and how much you have spent from your budget. You can also generate a pdf report from this.</h2>
+        <h3>Select the month you want to check</h3>
         <form method="POST" action="{% url 'savings_manager' %}">
             {% csrf_token %}
             <label for="month">Select Month:</label>
@@ -43,12 +45,12 @@
             <button type="submit">Show Deposits</button>
         </form>
 
-        <div id="deposite-records">
+        <div>
             <h3>Your deposits into your account</h3>
             {% if deposits %}
                 <ul>
                     {% for deposit in deposits %}
-                        <li>{{ deposit.date }}: ${{ deposit.total_balance }} - {{ deposit.source }} - {{ deposit.added_funds }}</li>
+                        <li>{{ deposit.date }}: {{currency}}-{{ deposit.total_balance }} - {{ deposit.source }} - {{ deposit.added_funds }} {{currency}}</li>
                     {% endfor %}
                 </ul>
             {% else %}
@@ -63,7 +65,7 @@
             {% if expenses1 %}
                 <ul>
                     {% for exp1 in expenses1 %}
-                        <li>{{ exp1.date }} - {{ exp1.shop }} - {{ exp1.product }} - {{ exp1.price }} </li>
+                        <li>{{ exp1.date }} - {{ exp1.shop }} - {{ exp1.product }} - {{ exp1.price }} {{currency}} </li>
                     {% endfor %}
                 </ul>
             {% else %}
@@ -76,7 +78,7 @@
             {% if expenses2 %}
                 <ul>
                     {% for exp2 in expenses2 %}
-                        <li>{{ exp2.date }} - {{ exp2.fee}} - {{ exp2.price }} </li>
+                        <li>{{ exp2.date }} - {{ exp2.fee}} - {{ exp2.price }} {{currency}}</li>
                     {% endfor %}
                 </ul>
             {% else %}
@@ -89,7 +91,7 @@
             {% if expenses3 %}
                 <ul>
                     {% for exp2 in expenses3 %}
-                        <li>{{ exp2.date }} - {{ exp2.for_what}} - {{ exp2.price }} </li>
+                        <li>{{ exp2.date }} - {{ exp2.for_what}} - {{ exp2.price }} {{currency}}</li>
                     {% endfor %}
                 </ul>
             {% else %}
