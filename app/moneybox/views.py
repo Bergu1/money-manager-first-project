@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import SavingsGoalForm, TransferToSavingsForm
+from .forms import SavingsGoalForm, TransferToSavingsForm, CashOutForm
 from core.models import SavingsGoal
 from django.contrib.auth.decorators import login_required
 
@@ -60,6 +60,54 @@ def transfer_to_savings(request):
         savings_progress = 0
 
     return render(request, 'moneybox/transfer_to_savings.html', {
+        'form': form,
+        'savings_goal': savings_goal,
+        'current_amount': current_amount_converted,
+        'target_amount': target_amount_converted,
+        'currency': user_currency,
+        'savings_progress': savings_progress
+    })
+
+
+@login_required
+def cash_out(request):
+    account = request.user.account
+    try:
+        savings_goal = SavingsGoal.objects.get(person=request.user)
+    except SavingsGoal.DoesNotExist:
+        return redirect('set_savings_goal')  # Użytkownik musi ustawić cel oszczędności
+
+    if request.method == 'POST':
+        form = CashOutForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+            amount_converted = request.user.convert_price_write(amount, request.user.currency)  # Konwersja kwoty wprowadzonej przez użytkownika
+
+            # Konwersja obecnej kwoty oszczędności na tę samą walutę co kwota do wypłaty
+            savings_current_converted = request.user.convert_price(savings_goal.current_amount, request.user.currency)
+
+            # Sprawdzenie, czy kwota do wypłaty jest mniejsza lub równa przeliczonej bieżącej kwocie w skarbonce
+            if amount_converted <= savings_current_converted:
+                savings_goal.current_amount -= amount_converted  # Zaktualizowanie kwoty w skarbonce w oryginalnej walucie
+                savings_goal.save()
+                account.update_balance(amount_converted, "add")  # Zwiększamy saldo konta
+                return redirect('transfer_to_savings')
+            else:
+                form.add_error('amount', 'Insufficient funds in your savings.')
+
+    else:
+        form = CashOutForm()
+
+    user_currency = request.user.currency
+    current_amount_converted = round(request.user.convert_price(savings_goal.current_amount, user_currency), 2)
+    target_amount_converted = round(request.user.convert_price(savings_goal.target_amount, user_currency), 2)
+
+    if savings_goal.target_amount > 0:
+        savings_progress = round((savings_goal.current_amount / savings_goal.target_amount) * 100, 2)
+    else:
+        savings_progress = 0
+
+    return render(request, 'moneybox/cash_out.html', {
         'form': form,
         'savings_goal': savings_goal,
         'current_amount': current_amount_converted,

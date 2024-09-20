@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Money box</title>
+    <title>Savings goal</title>
 </head>
 <body>
     <header>
-        <h1>Money Manager - Money box</h1>
+        <h1>Money Manager - Savings goal</h1>
         <p>Manage your food expenses effortlessly</p>
         <div>
             <a href="{% url 'logout' %}">Log Out</a>
@@ -40,16 +40,12 @@
         </ul>
     </nav>
     <h1>------------------------------------------------------------------------</h1>
-    <h1>Your money box!</h1>
-    <p>Your savings goal: {{ target_amount }} {{ currency }}</p>
-    <p>Currently saved: {{ current_amount }} {{ currency }}</p>
-    <p>Achieved: {{ savings_progress }}%</p>
-
+    <h1>Your savings goal!</h1>
     <form method="POST">
+        <p>Currently saved: {{ current_amount }} {{ currency }}</p>
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Transfer to the money box</button>
+        <button type="submit">Cash out </button>
     </form>
-    <li><a href="{% url 'cash_out' %}">If you what to check your deposite click here!</a></li>
 </body>
 </html>

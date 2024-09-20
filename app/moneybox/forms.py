@@ -10,3 +10,7 @@ class SavingsGoalForm(forms.ModelForm):
 class TransferToSavingsForm(forms.Form):
     amount = forms.DecimalField(max_digits=10, decimal_places=2)
 
+
+class CashOutForm(forms.Form):
+    amount = forms.DecimalField(max_digits=10, decimal_places=2)
+
