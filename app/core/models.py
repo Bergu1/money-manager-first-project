@@ -164,6 +164,7 @@ class Account(models.Model):
 
     def update_balance(self, amount, operation="add"):
         """ Aktualizacja bilansu konta. """
+        print(f"Before updating balance: Current balance: {self.total_balance}, Amount: {amount}, Operation: {operation}")
         if operation == "add":
             self.total_balance += amount
             self.added_funds = amount
@@ -171,6 +172,7 @@ class Account(models.Model):
         elif operation == "subtract":
             self.total_balance -= amount
             self.save_to_history(operation="subtract")
+        print(f"After updating balance: New balance: {self.total_balance}")
 
     def save_to_history(self, *args, **kwargs):
         """ Zapisuje historię transakcji na koncie. """

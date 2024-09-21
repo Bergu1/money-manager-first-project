@@ -9,6 +9,9 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 import csv
 from django.utils.encoding import smart_str
+from django.db import transaction
+from decimal import Decimal
+from datetime import datetime
 
 @login_required
 def savings_manager(request):
@@ -345,3 +348,94 @@ def generate_csv(request):
     writer.writerow([smart_str("Total Expenses"), smart_str(total_expenses)])
 
     return response
+
+
+@login_required
+def import_expenses_from_csv(request):
+    if request.method == 'GET':
+        return render(request, 'manager/upload_expenses_from_csv_file.html')
+
+    if request.method != 'POST':
+        return HttpResponse("Invalid request method. Please use POST.", status=400)
+
+    csv_file = request.FILES.get('csv_file')
+    if not csv_file:
+        return HttpResponse("Please upload a CSV file.", status=400)
+
+    person = request.user
+    account = person.account  # Konto użytkownika
+    user_currency = person.currency  # Waluta użytkownika
+
+    try:
+        decoded_file = csv_file.read().decode('utf-8-sig').splitlines()
+        reader = csv.DictReader(decoded_file, delimiter=';')
+
+        reader.fieldnames = [field.strip() for field in reader.fieldnames]
+        print(f"Field names from CSV after stripping: {reader.fieldnames}")
+
+        with transaction.atomic():
+            for row_data in reader:
+                try:
+                    row = {key.strip(): value.strip() for key, value in row_data.items()}
+
+                    # Pobieranie i walidacja daty
+                    raw_date = row.get('Date', '')
+                    if not raw_date:
+                        return HttpResponse("Date field is missing or empty in the CSV.", status=400)
+
+                    try:
+                        date = datetime.strptime(raw_date, "%Y-%m-%d").date() 
+                    except ValueError:
+                        return HttpResponse(f"Invalid date format: {raw_date}. Expected format is YYYY-MM-DD.", status=400)
+
+                    # Pobieranie reszty pól
+                    description = row.get('Description', '')
+                    details = row.get('Details', '')
+                    shop = row.get('Shop', '')
+
+                    if not row.get('Amount'):
+                        return HttpResponse("Amount field is empty in the CSV.", status=400)
+
+                    currency = row.get('Currency', '')
+
+                    amount = Decimal(row.get('Amount'))
+
+                    if currency != 'USD':
+                        amount_in_usd = person.convert_price_write(amount, currency)  
+                    else:
+                        amount_in_usd = amount 
+
+                    if description == "Daily Buy":
+                        daily_buy = DailyBuy.objects.create(
+                            person=person,
+                            date=date,
+                            product=details,
+                            shop=shop,
+                            price=amount_in_usd,  # Zapisujemy przeliczoną kwotę w USD
+                        )
+                    elif description == "Bill":
+                        bill = Bills.objects.create(
+                            person=person,
+                            date=date,
+                            fee=details,
+                            price=amount_in_usd,  # Zapisujemy w USD
+                        )
+                    elif description == "Random Expense":
+                        random_expense = Random_expenses.objects.create(
+                            person=person,
+                            date=date,
+                            for_what=details,
+                            price=amount_in_usd,  # Zapisujemy w USD
+                        )
+
+                    account.update_balance(amount_in_usd, operation="subtract")
+
+                except KeyError as e:
+                    return HttpResponse(f"Missing column in CSV: {e}", status=400)
+                except ValueError:
+                    return HttpResponse("Invalid data format in CSV.", status=400)
+            
+        return HttpResponse("Expenses imported successfully.", status=200)
+
+    except Exception as e:
+        return HttpResponse(f"Error processing the CSV file: {e}", status=500)
