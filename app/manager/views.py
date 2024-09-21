@@ -7,6 +7,8 @@ from django.db.models import Sum
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 from django.http import HttpResponse
+import csv
+from django.utils.encoding import smart_str
 
 @login_required
 def savings_manager(request):
@@ -195,6 +197,7 @@ def generate_pdf(request):
         'expenses1': expenses1,
         'expenses2': expenses2,
         'expenses3': expenses3,
+        'currency': person.currency,
     }
 
     html = render_to_string('manager/pdf_template.html', context)
@@ -218,3 +221,127 @@ def set_currency(request):
         return redirect('mainPage')
     else:
         return redirect('mainPage')
+
+
+@login_required
+def generate_csv(request):
+    if request.method != 'POST':
+        return HttpResponse("Invalid request method. Please use POST.", status=400)
+    
+    person = request.user
+
+    try:
+        month = int(request.POST.get('month'))
+        year = int(request.POST.get('year'))
+    except (TypeError, ValueError):
+        return HttpResponse("Invalid month or year. Please provide valid integers.", status=400)
+
+    if not (month and year):
+        return HttpResponse("Month and year are required.", status=400)
+
+    deposits = AccountHistory.objects.annotate(
+        month=ExtractMonth('date'),
+        year=ExtractYear('date')
+    ).filter(
+        account=person.account,
+        year=year,
+        month=month,
+        added_funds__gt=0  
+    )
+    total_deposits = deposits.aggregate(total=Sum('added_funds'))['total'] or 0
+    total_deposits = round(person.convert_price(total_deposits, person.currency), 2)
+
+    expenses1 = DailyBuy.objects.annotate(
+        month=ExtractMonth('date'),
+        year=ExtractYear('date')
+    ).filter(
+        person=person,
+        year=year,
+        month=month
+    )
+    total_expenses1 = expenses1.aggregate(total=Sum('price'))['total'] or 0
+    total_expenses1 = person.convert_price(total_expenses1, person.currency)
+
+    expenses2 = Bills.objects.annotate(
+        month=ExtractMonth('date'),
+        year=ExtractYear('date')
+    ).filter(
+        person=person,
+        year=year,
+        month=month
+    )
+    total_expenses2 = expenses2.aggregate(total=Sum('price'))['total'] or 0
+    total_expenses2 = person.convert_price(total_expenses2, person.currency)
+
+    expenses3 = Random_expenses.objects.annotate(
+        month=ExtractMonth('date'),
+        year=ExtractYear('date')
+    ).filter(
+        person=person,
+        year=year,
+        month=month
+    )
+    total_expenses3 = expenses3.aggregate(total=Sum('price'))['total'] or 0
+    total_expenses3 = person.convert_price(total_expenses3, person.currency)
+
+    total_expenses = round(total_expenses1 + total_expenses2 + total_expenses3, 2)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="savings_report_{month}_{year}.csv"'
+
+    writer = csv.writer(response, delimiter=';')
+    
+    writer.writerow([
+        smart_str("Date"), 
+        smart_str("Description"),
+        smart_str("Details"),
+        smart_str("Shop"),
+        smart_str("Amount"),
+        smart_str("Currency"),
+    ])
+
+    for deposit in deposits:
+        writer.writerow([
+            smart_str(deposit.date), 
+            smart_str("Deposit"),
+            smart_str(deposit.source),
+            smart_str(" "),
+            smart_str(round(person.convert_price(deposit.added_funds, person.currency), 2)),
+            smart_str(person.currency),
+        ])
+
+    for expense in expenses1:
+        writer.writerow([
+            smart_str(expense.date), 
+            smart_str("Daily Buy"),
+            smart_str(expense.product),
+            smart_str(expense.shop),
+            smart_str(round(person.convert_price(expense.price, person.currency), 2)),
+            smart_str(person.currency),
+        ])
+
+    for expense in expenses2:
+        writer.writerow([
+            smart_str(expense.date), 
+            smart_str("Bill"),
+            smart_str(expense.fee),
+            smart_str(" "),
+            smart_str(round(person.convert_price(expense.price, person.currency), 2)),
+            smart_str(person.currency),
+        ])
+
+    for expense in expenses3:
+        writer.writerow([
+            smart_str(expense.date), 
+            smart_str("Random Expense"),
+            smart_str(expense.for_what),
+            smart_str(" "),
+            smart_str(round(person.convert_price(expense.price, person.currency), 2)),
+            smart_str(person.currency),
+        ])
+
+    writer.writerow([])
+    writer.writerow([smart_str("Total Deposits"), smart_str(total_deposits)])
+    writer.writerow([smart_str("Total Expenses"), smart_str(total_expenses)])
+
+    return response

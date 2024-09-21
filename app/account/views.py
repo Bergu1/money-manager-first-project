@@ -14,7 +14,7 @@ def account(request):
             added_funds = form.cleaned_data['added_funds']
             if added_funds > 0:
                 account.added_funds = request.user.convert_price_write(added_funds, currency)
-                account.update_balance(added_funds, "add")
+                account.update_balance(account.added_funds, "add")
                 account.added_funds = 0
             return redirect('account')
         else:

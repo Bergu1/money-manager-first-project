@@ -21,8 +21,8 @@
     <div class="data-row"><strong>Date of Birth:</strong> {{ person.date_of_birth }}</div>
 
     <div class="section-title">Financial Overview</div>
-    <div class="data-row"><strong>Total Deposits:</strong> {{ total_deposits }}</div>
-    <div class="data-row"><strong>Total Expenses:</strong> {{ total_expenses }}</div>
+    <div class="data-row"><strong>Total Deposits:</strong> {{ total_deposits }} {{ currency }}</div>
+    <div class="data-row"><strong>Total Expenses:</strong> {{ total_expenses }} {{ currency }}</div>
 
     <div class="section-title">Deposits</div>
     <table>
@@ -34,8 +34,8 @@
         {% for deposit in deposits %}
         <tr>
             <td>{{ deposit.date }}</td>
-            <td>{{ deposit.source }}</td>
-            <td>{{ deposit.added_funds }}</td>
+            <td>{{ deposit.source }} </td>
+            <td>{{ deposit.added_funds }} {{ currency }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -53,7 +53,7 @@
             <td>{{ expense.date }}</td>
             <td>{{ expense.shop }}</td>
             <td>{{ expense.product }}</td>
-            <td>{{ expense.price }}</td>
+            <td>{{ expense.price }} {{ currency }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -68,7 +68,7 @@
         <tr>
             <td>{{ expense.date }}</td>
             <td>{{ expense.fee }}</td>
-            <td>{{ expense.price }}</td>
+            <td>{{ expense.price }} {{ currency }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -81,9 +81,9 @@
         </tr>
         {% for expense in expenses3 %}
         <tr>
-            <td>{{ expense.date }}</td>
-            <td>{{ expense.for_what }}</td>
-            <td>{{ expense.price }}</td>
+            <td>{{ expense.date }} </td>
+            <td>{{ expense.for_what }} </td>
+            <td>{{ expense.price }} {{ currency }}</td>
         </tr>
         {% endfor %}
     </table>

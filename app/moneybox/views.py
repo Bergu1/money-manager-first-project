@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from .forms import SavingsGoalForm, TransferToSavingsForm, CashOutForm
-from core.models import SavingsGoal
+from core.models import SavingsGoal, Random_expenses
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
+
 
 @login_required
 def set_savings_goal(request):
@@ -15,7 +17,16 @@ def set_savings_goal(request):
         if form.is_valid():
             goal = form.save(commit=False)
             goal.person = request.user
-            goal.save()
+            target_amount = form.cleaned_data['target_amount']
+            target_amount_converted = request.user.convert_price_write(target_amount, request.user.currency)
+
+            if savings_goal:
+                savings_goal.target_amount = target_amount_converted
+                savings_goal.save()
+            else:
+                goal.target_amount = target_amount_converted
+                goal.save()
+
             return redirect('transfer_to_savings')
     else:
         form = SavingsGoalForm(instance=savings_goal)
@@ -25,6 +36,7 @@ def set_savings_goal(request):
         'form': form,
         'currency': user_currency
     })
+
 
 @login_required
 def transfer_to_savings(request):
@@ -44,6 +56,15 @@ def transfer_to_savings(request):
                 account.update_balance(amount_converted, "subtract")
                 savings_goal.current_amount += amount_converted
                 savings_goal.save()
+
+                random_expense = Random_expenses(
+                    person=request.user,
+                    for_what=f'Payment to the piggy bank',
+                    price=amount_converted,
+                    date=datetime.now()
+                )
+                random_expense.save()  
+
                 return redirect('transfer_to_savings')
             else:
                 form.add_error('amount', 'Lack of money on your account.')
@@ -81,16 +102,17 @@ def cash_out(request):
         form = CashOutForm(request.POST)
         if form.is_valid():
             amount = form.cleaned_data['amount']
-            amount_converted = request.user.convert_price_write(amount, request.user.currency)  # Konwersja kwoty wprowadzonej przez użytkownika
+            amount_converted = request.user.convert_price_write(amount, request.user.currency)
 
-            # Konwersja obecnej kwoty oszczędności na tę samą walutę co kwota do wypłaty
+            
             savings_current_converted = request.user.convert_price(savings_goal.current_amount, request.user.currency)
 
-            # Sprawdzenie, czy kwota do wypłaty jest mniejsza lub równa przeliczonej bieżącej kwocie w skarbonce
+            
             if amount_converted <= savings_current_converted:
-                savings_goal.current_amount -= amount_converted  # Zaktualizowanie kwoty w skarbonce w oryginalnej walucie
+                savings_goal.current_amount -= amount_converted
                 savings_goal.save()
-                account.update_balance(amount_converted, "add")  # Zwiększamy saldo konta
+                account.source = "cash out from money box"
+                account.update_balance(amount_converted, "add")
                 return redirect('transfer_to_savings')
             else:
                 form.add_error('amount', 'Insufficient funds in your savings.')

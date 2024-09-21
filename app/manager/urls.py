@@ -8,4 +8,5 @@ urlpatterns = [
     path('purchases/', views.purchase_list, name='expenses_manager'),
     path('generate-pdf/', views.generate_pdf, name='generate_pdf'),
     path('set_currency/', views.set_currency, name='set_currency'),
+    path('generate-csv/', views.generate_csv, name='generate_csv'),
 ]

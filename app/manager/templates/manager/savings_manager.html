@@ -107,7 +107,7 @@
         </div>
         <h2>Your expenses in this month: {{ expenses }} {{ currency }}</h2>
         <h3>--------------------------------------------------------------------------------------------</h3>
-        <h1>Generate summary</h1>
+        <h1>Generate PDF summary</h1>
         <p>Enter the month and year from which you want to generate a summary below</p>
         <form action="{% url 'generate_pdf' %}" method="POST">
             {% csrf_token %}
@@ -118,6 +118,19 @@
             <input type="number" id="year" name="year" min="2000" max="2100" required>
         
             <button type="submit">Generate PDF</button>
+        </form>
+
+        <h1>Generate CSV summary</h1>
+        <p>Enter the month and year from which you want to generate a summary below</p>
+        <form action="{% url 'generate_csv' %}" method="POST">
+            {% csrf_token %}
+            <label for="month">Month:</label>
+            <input type="number" id="month" name="month" min="1" max="12" required>
+        
+            <label for="year">Year:</label>
+            <input type="number" id="year" name="year" min="2000" max="2100" required>
+        
+            <button type="submit">Generate CSV</button>
         </form>
     </main>
 </body>
