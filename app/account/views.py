@@ -3,6 +3,7 @@ from .forms import AccountForm
 from django.contrib.auth.decorators import login_required
 from django.db.models.functions import ExtractMonth, ExtractYear
 from core.models import AccountHistory
+from django.contrib import messages
 
 @login_required
 def account(request):
@@ -16,6 +17,7 @@ def account(request):
                 account.added_funds = request.user.convert_price_write(added_funds, currency)
                 account.update_balance(account.added_funds, "add")
                 account.added_funds = 0
+                messages.success(request, 'Added successfully!')
             return redirect('account')
         else:
             print(form.errors)

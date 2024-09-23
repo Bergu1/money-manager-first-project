@@ -53,6 +53,13 @@
             <input type="number" id="price" name="price" step="0.01"><br>
             <button type="submit">Add Record</button>
         </form>
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li class="success">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
     </main>
 </body>
 </html>

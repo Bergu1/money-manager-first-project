@@ -72,7 +72,12 @@ class AccountHistoryAdmin(admin.ModelAdmin):
     list_filter = ('date', 'timestamp')
 
 
+class MoneyBoxAdmin(admin.ModelAdmin):
+    list_display = ('person', 'target_amount', 'current_amount', 'created_at')
+
+
 admin.site.register(models.Person, UserAdmin)
+admin.site.register(models.SavingsGoal, MoneyBoxAdmin)
 admin.site.register(models.DailyBuy, DailyBuyAdmin)
 admin.site.register(models.Bills, BillsAdmin)
 admin.site.register(models.Random_expenses, RandomExpensesAdmin)

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import DailyBuyForm, RandomExpensesForm, BillsForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 
@@ -16,6 +17,7 @@ def daily_buy(request):
             daily_buy.price = request.user.convert_price_write(daily_buy.price, request.user.currency)
             daily_buy.save()
             account.update_balance(daily_buy.price, "subtract")
+            messages.success(request, 'Added successfully!')
             return redirect('daily_buy')
     else:
         form = DailyBuyForm()
@@ -34,6 +36,7 @@ def bills(request):
             bills.price = request.user.convert_price_write(bills.price, request.user.currency)
             bills.save()
             account.update_balance(bills.price, "subtract")
+            messages.success(request, 'Added successfully!')
             return redirect('bills')
     else:
         form = BillsForm()
@@ -52,6 +55,7 @@ def random_expenses(request):
             random_expenses.price = request.user.convert_price_write(random_expenses.price, request.user.currency)
             random_expenses.save()
             account.update_balance(random_expenses.price, "subtract")
+            messages.success(request, 'Added successfully!')
             return redirect('random_expenses')
     else:
         form = RandomExpensesForm()

@@ -55,6 +55,13 @@
             <input type="date" id="date" name="date" required>
 
             <button type="submit">Add Money</button>
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li class="success">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
             <li><a href="{% url 'show_deposit' %}">If you what to check your deposite click here!</a></li>
         </form>
     </main>

@@ -58,17 +58,25 @@ class Person(AbstractBaseUser, PermissionsMixin):
 
     def get_exchange_rate(self, base_currency, target_currency):
         api_key = 'f193fd51d73d8997215547c8'
-        url = f"https://v6.exchangerate-api.com/v6/f193fd51d73d8997215547c8/latest/USD"
+        url = f"https://v6.exchangerate-api.com/v6/8082cc5707a9f29d8a5b5f4f/latest/USD"
         response = requests.get(url)
         data = response.json()
+        if data['result'] == 'error' and data['error-type'] == 'quota-reached':
+            print("Limit zapytań został osiągnięty!")
+        else:
+            print("Limit zapytań nie został jeszcze osiągnięty.")
         return Decimal(data['conversion_rates'].get(target_currency, 1))
 
 
     def get_exchange_rate_write(self, base_currency, target_currency):
         api_key = 'f193fd51d73d8997215547c8'
-        url = f"https://v6.exchangerate-api.com/v6/f193fd51d73d8997215547c8/latest/USD"
+        url = f"https://v6.exchangerate-api.com/v6/8082cc5707a9f29d8a5b5f4f/latest/USD"
         response = requests.get(url)
         data = response.json()
+        if data['result'] == 'error' and data['error-type'] == 'quota-reached':
+            print("Limit zapytań został osiągnięty!")
+        else:
+            print("Limit zapytań nie został jeszcze osiągnięty.")
         rate = Decimal(data['conversion_rates'].get(target_currency, 1))
         if target_currency == 'USD':
             return rate
@@ -111,7 +119,7 @@ class DailyBuy(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     day = models.CharField(max_length=10, choices=DAYS_OF_WEEK)
-    date = models.DateField()
+    date = models.DateField(default=timezone.now)
     shop = models.CharField(max_length=100)
     product = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -127,7 +135,7 @@ class DailyBuy(models.Model):
 
 class Bills(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    date = models.DateField()
+    date = models.DateField(default=timezone.now)
     fee = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
@@ -142,7 +150,7 @@ class Bills(models.Model):
 
 class Random_expenses(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    date = models.DateField()
+    date = models.DateField(default=timezone.now)
     for_what = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -157,7 +165,7 @@ class Random_expenses(models.Model):
 
 class Account(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    date = models.DateField()
+    date = models.DateField(default=timezone.now)
     added_funds = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     source = models.CharField(max_length=100, default='Unknown')
@@ -193,11 +201,15 @@ class Account(models.Model):
 
 class AccountHistory(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, default=0)
-    date = models.DateField()
+    date = models.DateField(default=timezone.now)
     added_funds = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     source = models.CharField(max_length=100, default='Unknown')
     timestamp = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Account history'
+        verbose_name_plural = 'Accounts history'
 
     def __str__(self):
         return f'History for Account on {self.date} - Balance: {self.total_balance}'

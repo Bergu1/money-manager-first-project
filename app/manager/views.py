@@ -363,8 +363,8 @@ def import_expenses_from_csv(request):
         return HttpResponse("Please upload a CSV file.", status=400)
 
     person = request.user
-    account = person.account  # Konto użytkownika
-    user_currency = person.currency  # Waluta użytkownika
+    account = person.account 
+    user_currency = person.currency  
 
     try:
         decoded_file = csv_file.read().decode('utf-8-sig').splitlines()
@@ -378,7 +378,6 @@ def import_expenses_from_csv(request):
                 try:
                     row = {key.strip(): value.strip() for key, value in row_data.items()}
 
-                    # Pobieranie i walidacja daty
                     raw_date = row.get('Date', '')
                     if not raw_date:
                         return HttpResponse("Date field is missing or empty in the CSV.", status=400)
@@ -388,7 +387,6 @@ def import_expenses_from_csv(request):
                     except ValueError:
                         return HttpResponse(f"Invalid date format: {raw_date}. Expected format is YYYY-MM-DD.", status=400)
 
-                    # Pobieranie reszty pól
                     description = row.get('Description', '')
                     details = row.get('Details', '')
                     shop = row.get('Shop', '')
@@ -411,21 +409,21 @@ def import_expenses_from_csv(request):
                             date=date,
                             product=details,
                             shop=shop,
-                            price=amount_in_usd,  # Zapisujemy przeliczoną kwotę w USD
+                            price=amount_in_usd,
                         )
                     elif description == "Bill":
                         bill = Bills.objects.create(
                             person=person,
                             date=date,
                             fee=details,
-                            price=amount_in_usd,  # Zapisujemy w USD
+                            price=amount_in_usd, 
                         )
                     elif description == "Random Expense":
                         random_expense = Random_expenses.objects.create(
                             person=person,
                             date=date,
                             for_what=details,
-                            price=amount_in_usd,  # Zapisujemy w USD
+                            price=amount_in_usd,
                         )
 
                     account.update_balance(amount_in_usd, operation="subtract")
@@ -435,7 +433,7 @@ def import_expenses_from_csv(request):
                 except ValueError:
                     return HttpResponse("Invalid data format in CSV.", status=400)
             
-        return HttpResponse("Expenses imported successfully.", status=200)
+        return render(request, 'manager/success_with_redirect.html')
 
     except Exception as e:
         return HttpResponse(f"Error processing the CSV file: {e}", status=500)
