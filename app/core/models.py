@@ -29,7 +29,7 @@ class PersonManager(BaseUserManager):
         person = self.create_user(username, email, password, **extra_fields)
         person.is_staff = True
         person.is_superuser = True
-        person.save(using=self._db)  # Poprawione: "self.db" zmienione na "self._db"
+        person.save(using=self._db)
         return person
 
 
@@ -58,7 +58,7 @@ class Person(AbstractBaseUser, PermissionsMixin):
 
     def get_exchange_rate(self, base_currency, target_currency):
         api_key = 'f193fd51d73d8997215547c8'
-        url = f"https://v6.exchangerate-api.com/v6/8082cc5707a9f29d8a5b5f4f/latest/USD"
+        url = f"https://v6.exchangerate-api.com/v6/8082cc5707a9f29d8a5b5f4f/latest/PLN"
         response = requests.get(url)
         data = response.json()
         if data['result'] == 'error' and data['error-type'] == 'quota-reached':
@@ -70,35 +70,40 @@ class Person(AbstractBaseUser, PermissionsMixin):
 
     def get_exchange_rate_write(self, base_currency, target_currency):
         api_key = 'f193fd51d73d8997215547c8'
-        url = f"https://v6.exchangerate-api.com/v6/8082cc5707a9f29d8a5b5f4f/latest/USD"
+        url = f"https://v6.exchangerate-api.com/v6/8082cc5707a9f29d8a5b5f4f/latest/PLN"
         response = requests.get(url)
         data = response.json()
+        print(f"Dane API: {data}")
         if data['result'] == 'error' and data['error-type'] == 'quota-reached':
             print("Limit zapytań został osiągnięty!")
         else:
             print("Limit zapytań nie został jeszcze osiągnięty.")
         rate = Decimal(data['conversion_rates'].get(target_currency, 1))
-        if target_currency == 'USD':
+        if target_currency == 'PLN':
             return rate
         else:
             return 1 / rate
 
 
     def convert_price(self, price, user_currency):
-        base_currency = 'USD'
+        base_currency = 'PLN'
         if user_currency != base_currency:
             rate = self.get_exchange_rate(base_currency, user_currency)
+            print(f"Kurs wymiany z PLN na {user_currency}: {rate}")
             rate = Decimal(rate)
             return price * rate
+        print(f"Cena bez przeliczenia (PLN): {price}")
         return price
 
 
     def convert_price_write(self, price, user_currency):
-        base_currency = 'USD'
+        base_currency = 'PLN'
         if user_currency != base_currency:
             rate = self.get_exchange_rate_write(base_currency, user_currency)
+            print(f"Kurs wymiany z PLN na {user_currency}: {rate}")
             rate = Decimal(rate)
             return price * rate
+        print(f"Cena bez przeliczenia (PLN): {price}")
         return price
 
 
@@ -222,4 +227,4 @@ class SavingsGoal(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username}'s Savings Goal"
+        return f"{self.person.username}'s Savings Goal"

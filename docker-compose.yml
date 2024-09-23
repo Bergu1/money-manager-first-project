@@ -17,13 +17,14 @@ services:
       - DB_NAME=moneydb
       - DB_USER=devkonrad
       - DB_PASS=2003kk
+      - DEBUG=1
     depends_on:
       - db
 
   db:
     image: postgres:13-alpine
     volumes:
-      - dev-db-data:/var/lib/postgresql/data # docker save data in volumes and after removing container we will still be having data
+      - dev-db-data:/var/lib/postgresql/data 
     environment:
       - POSTGRES_DB=moneydb
       - POSTGRES_USER=devkonrad
