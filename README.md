@@ -1,49 +1,49 @@
 # Money Manager
-Money Manager to aplikacja webowa, która pomaga użytkownikom nadzorować miesięczny budżet oraz zarządzać wydatkami i oszczędnościami w różnych walutach.
+Money Manager is a web application that helps users oversee their monthly budget and manage expenses and savings in different currencies.
 
-## Funkcjonalności
-* **Rejestracja i logowanie:** Użytkownicy mogą zarejestrować się, zalogować oraz zresetować hasło przez email.
-* **Zarządzanie wydatkami:** W zakładce "Expenses" można dodawać wydatki (rachunki, codzienne zakupy, wydatki losowe) oraz importować wydatki z pliku CSV.
-* **Zarządzanie kontem:** W zakładce "Account" można dodawać wpływy na konto (np. wypłata), przeglądać wpływy z danego miesiąca oraz sprawdzać zaktualizowany bilans.
-* **Miesięczny przegląd finansowy:** Zakładka "Manager" pozwala sprawdzić miesięczne wydatki i przychody, generować raporty w formacie PDF lub CSV oraz ocenić, czy użytkownik jest "na plusie" lub "na minusie".
-* **Skarbonka:** Zakładka "Money Box" umożliwia użytkownikowi ustalanie celu oszczędnościowego, dokonywanie wpłat oraz śledzenie postępu procentowego w realizacji celu.
-* Aplikacja obsługuje trzy waluty i dynamicznie aktualizuje bilans po każdej operacji, korzystając z API do przeliczania walut.
+## Features
+* **Registration and Login:** Users can register, log in, and reset their password via email.
+* **Expenses Managment:** In the "Expenses" section, users can add expenses (bills, daily purchases, random expenses) and import expenses from a CSV file.
+* **Account Managment:** In the "Account" section, users can add income (e.g., salary), review income for a given month, and check the updated balance.
+* **Monthly Financial Overview:** The "Manager" section allows users to review their monthly expenses and income, generate reports in PDF or CSV format, and assess whether they are "in the black" or "in the red".
+* **Savings Goal:** The "Money Box" section enables users to set a savings goal, make deposits, and track the percentage progress toward reaching the goal.
+* The application supports three currencies and dynamically updates the balance after each transaction using an API for currency conversion.
 
-## Technologie
+## Technologies
 * **Backend:** Python, Django
 * **Frontend:** HTML
-* **Bazy danych:** PostgreSQL
-* **Testowanie:** pytest, unittest.mock
-* **Konteneryzacja:** Docker
+* **Databases:** PostgreSQL
+* **Testing:** pytest, unittest.mock
+* **Containerization:** Docker
 * **CI/CD:** Github Actions
 * **Hosting:** AWS EC2
-* **API:** ExchangeRate-API (przeliczanie walut)
+* **API:** ExchangeRate-API (currency conversion)
 
-## Instalacja
-1. Sklonuj repozytorium:
+## Installation
+1. Clone the repository:
    ```bash
    git clone https://github.com/Bergu1/money-manager-first-project.git
    ```
-2. Przejdź do katalogu:
+2. Navigate to the project directiory:
    ```bash
    cd money-manager-first-project
    ```
-3. Przejdź do katalogu:
+3. Start the application:
    ```bash
    docker-compose up --build
    ```
-4. Aplikacja będzie dostępna pod adresem: http://localhost:8000
+4. The application will be available at: http://localhost:8000
 
-## Użycie
-1. Zarejestruj się lub zaloguj do aplikacji.
-2. Przejdź do zakładki Expenses, aby dodać wydatki lub zaimportować je z pliku CSV.
-3. W zakładce Account możesz dodać środki na swoje konto i śledzić swój bilans.
-4. Skorzystaj z zakładki Manager, aby śledzić swoją sytuacje finansową oraz wygenerować raporty finansowe z danego miesiąca.
-5. W zakładce Money Box ustaw swój cel oszczędnościowy i wpłacaj środki, aby go zrealizować.
+## Usage
+1. Register or log in to the application.
+2. Navigate to the Expenses tab to add expenses or import them from a CSV file.
+3. In the Account tab, you can add funds to your account and track your balance.
+4. Use the Manager tab to monitor your financial situation and generate financial reports for a given month.
+5. In the Money Box tab, set your savings goal and deposit funds to achieve it.
 
 ## Live Demo 
-Aplikację można zobaczyć na żywo pod tym linkiem:
+You can view the live application at this link:
 [Money Manager - Live Demo](http://ec2-13-60-82-173.eu-north-1.compute.amazonaws.com/login/)
 
-## Autorzy 
+## Authors
 * Konrad Landzberg 
