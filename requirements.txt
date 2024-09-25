@@ -2,3 +2,4 @@ Django>=3.2.4,<3.3
 psycopg2>=2.8.6,<2.9
 xhtml2pdf
 uwsgi>=2.0.19,<2.1
+django-widget-tweaks

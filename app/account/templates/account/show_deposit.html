@@ -1,71 +1,109 @@
+{% load widget_tweaks %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Show Deposit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .bg-gradient {
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+        }
+        .card-custom {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .nav-custom {
+            margin-bottom: 20px;
+        }
+        .nav-link {
+            color: #007bff;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+        .logout-button {
+            color: white;
+            background-color: #dc3545;
+            padding: 5px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .logout-button:hover {
+            background-color: #c82333;
+        }
+        .success {
+            color: green;
+        }
+    </style>
 </head>
-<body>
-    <header>
+<body class="bg-gradient">
+    <header class="text-center my-4">
         <h1>Money Manager - Summary of Deposit</h1>
-        <p>Manage your food expenses effortlessly</p>
-        <div class="logout-container">
+        <p>Manage your deposits effortlessly</p>
+        <div>
             <a href="{% url 'logout' %}" class="logout-button">Log Out</a>
         </div>
     </header>
-    <nav>
-        <ul>
-            <li><a href="{% url 'mainPage' %}">Home</a></li>
-            <li>
-                <a>Expenses</a>
-                <ul>
-                    <li><a href="{% url 'bills' %}">Bills</a></li>
-                    <li><a href="{% url 'daily_buy' %}">Daily Buy</a></li>
-                    <li><a href="{% url 'random_expenses' %}">Random Expenses</a></li>
-                    <li><a href="{% url 'upload-from-file' %}">Upload your expenses from file</a></li>
-                </ul>
-            </li>
-            <li>
-                <a>Manager</a>
-                <ul>
-                    <li><a href="{% url 'expenses_manager' %}">Check your expenses</a></li>
-                    <li><a href="{% url 'savings_manager' %}">Check how much you have saved</a></li>
-                </ul>
-            </li>
-            <li><a href="{% url 'account' %}">Account</a></li>
-            <li>
-                <a>Money Box</a>
-                <ul>
-                    <li><a href="{% url 'transfer_to_savings' %}">Transfer money to money box</a></li>
-                    <li><a href="{% url 'set_savings_goal' %}">Set a savings goal</a></li>
-                </ul>
-            </li>
-        </ul>
+
+    <nav class="nav nav-pills nav-fill nav-custom">
+        <a class="nav-link" href="{% url 'mainPage' %}">Home</a>
+        <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Expenses</a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'bills' %}">Bills</a></li>
+                <li><a class="dropdown-item" href="{% url 'daily_buy' %}">Daily Buy</a></li>
+                <li><a class="dropdown-item" href="{% url 'random_expenses' %}">Random Expenses</a></li>
+                <li><a class="dropdown-item" href="{% url 'upload-from-file' %}">Upload your expenses from file</a></li>
+            </ul>
+        </div>
+        <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Manager</a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'expenses_manager' %}">Check your expenses</a></li>
+                <li><a class="dropdown-item" href="{% url 'savings_manager' %}">Check how much you have saved</a></li>
+            </ul>
+        </div>
+        <a class="nav-link" href="{% url 'account' %}">Account</a>
+        <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Money Box</a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'transfer_to_savings' %}">Transfer money to money box</a></li>
+                <li><a class="dropdown-item" href="{% url 'set_savings_goal' %}">Set a savings goal</a></li>
+            </ul>
+        </div>
     </nav>
-    <h1>------------------------------------------------------------------------</h1>
-    <main>
-        <h2>You can select a date and check how much money was transferred to your account on that day.</h2>
-        <h3>Select Date:</h3>
-        <form method="POST" action="{% url 'show_deposit' %}">
+
+    <div class="card card-custom">
+        <h2 class="text-center mb-4">Check how much was transferred to your account</h2>
+        <form method="POST" action="{% url 'show_deposit' %}" class="mb-4">
             {% csrf_token %}
-            <label for="month">Select Month:</label>
-            <input type="text" id="month" name="month">
-            <label for="year">Select Year:</label>
-            <input type="text" id="year" name="year">
-            <button type="submit">Show Deposits</button>
+            <div class="mb-3">
+                <label for="month" class="form-label">Select Month:</label>
+                <input type="text" id="month" name="month" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="year" class="form-label">Select Year:</label>
+                <input type="text" id="year" name="year" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Show Deposits</button>
         </form>
 
         <div>
             <h3>Deposits on Selected Date</h3>
             {% if deposits %}
-                <ul>
+                <ul class="list-group">
                     {% for deposit in deposits %}
-                        <li>{{ deposit.added_funds }} {{ currency }}- {{ deposit.source }} - {{ deposit.date }}: {{ deposit.total_balance }} {{ currency }}</li>
+                        <li class="list-group-item">{{ deposit.added_funds }} {{ currency }} - {{ deposit.source }} - {{ deposit.date }}: {{ deposit.total_balance }} {{ currency }}</li>
                     {% endfor %}
                 </ul>
             {% else %}
                 <p>No deposits found for the selected date.</p>
             {% endif %}
         </div>
-        
-    </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

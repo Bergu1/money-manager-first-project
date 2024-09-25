@@ -1,77 +1,116 @@
+{% load widget_tweaks %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Daily Buy expenses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .bg-gradient {
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+        }
+        .card-custom {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .nav-custom {
+            margin-bottom: 20px;
+        }
+        .nav-link {
+            color: #007bff;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+        .success {
+            color: green;
+        }
+    </style>
 </head>
-<body>
-    <header>
+<body class="bg-gradient">
+    <header class="text-center my-4">
         <h1>Money Manager - Daily Buy</h1>
-        <p>Manage your food expenses effortlessly</p>
+        <p>Manage your daily buy expenses effortlessly</p>
         <div>
-            <a href="{% url 'logout' %}">Log Out</a>
+            <a href="{% url 'logout' %}" class="btn btn-secondary">Log Out</a>
         </div>
     </header>
-    <nav>
-        <ul>
-            <li><a href="{% url 'mainPage' %}">Home</a></li>
-            <li>
-                <a>Expenses</a>
-                <ul>
-                    <li><a href="{% url 'bills' %}">Bills</a></li>
-                    <li><a href="{% url 'daily_buy' %}">Daily Buy</a></li>
-                    <li><a href="{% url 'random_expenses' %}">Random Expenses</a></li>
-                    <li><a href="{% url 'upload-from-file' %}">Upload your expenses from file</a></li>
-                </ul>
-            </li>
-            <li>
-                <a>Manager</a>
-                <ul>
-                    <li><a href="{% url 'expenses_manager' %}">Check your expenses</a></li>
-                    <li><a href="{% url 'savings_manager' %}">Check how much you have saved</a></li>
-                </ul>
-            </li>
-            <li><a href="{% url 'account' %}">Account</a></li>
-            <li>
-                <a>Money Box</a>
-                <ul>
-                    <li><a href="{% url 'transfer_to_savings' %}">Transfer money to money box</a></li>
-                    <li><a href="{% url 'set_savings_goal' %}">Set a savings goal</a></li>
-                </ul>
-            </li>
-        </ul>
+
+    <nav class="nav nav-pills nav-fill nav-custom">
+        <a class="nav-link" href="{% url 'mainPage' %}">Home</a>
+        <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Expenses</a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'bills' %}">Bills</a></li>
+                <li><a class="dropdown-item" href="{% url 'daily_buy' %}">Daily Buy</a></li>
+                <li><a class="dropdown-item" href="{% url 'random_expenses' %}">Random Expenses</a></li>
+                <li><a class="dropdown-item" href="{% url 'upload-from-file' %}">Upload your expenses from file</a></li>
+            </ul>
+        </div>
+        <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Manager</a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'expenses_manager' %}">Check your expenses</a></li>
+                <li><a class="dropdown-item" href="{% url 'savings_manager' %}">Check how much you have saved</a></li>
+            </ul>
+        </div>
+        <a class="nav-link" href="{% url 'account' %}">Account</a>
+        <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Money Box</a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'transfer_to_savings' %}">Transfer money to money box</a></li>
+                <li><a class="dropdown-item" href="{% url 'set_savings_goal' %}">Set a savings goal</a></li>
+            </ul>
+        </div>
     </nav>
-    <h1>------------------------------------------------------------------------</h1>
-    <main>
-        <h2>What have you bought today?</h2>
+
+    <div class="card card-custom">
+        <h2 class="text-center mb-4">What have you bought today?</h2>
         <form method="post">
             {% csrf_token %}
-            <label for="day">Add Day:</label>
-            <select id="day" name="day">
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-                <option value="Saturday">Saturday</option>
-                <option value="Sunday">Sunday</option>
-            </select><br>
-            <label for="date">Add Date:</label>
-            <input type="date" id="date" name="date"><br>
-            <label for="shop">Add Shop:</label>
-            <input type="text" id="shop" name="shop"><br>
-            <label for="product">Add Product:</label>
-            <input type="text" id="product" name="product"><br>
-            <label for="price">Add Price:</label>
-            <input type="number" id="price" name="price" step="0.01"><br>
-            <button type="submit">Add Record</button>
+            <div class="mb-3">
+                <label for="day" class="form-label">Add Day:</label>
+                <select id="day" name="day" class="form-select">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="date" class="form-label">Add Date:</label>
+                <input type="date" id="date" name="date" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="shop" class="form-label">Add Shop:</label>
+                <input type="text" id="shop" name="shop" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="product" class="form-label">Add Product:</label>
+                <input type="text" id="product" name="product" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Add Price:</label>
+                <input type="number" id="price" name="price" step="0.01" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Add Record</button>
         </form>
+
         {% if messages %}
-        <ul>
-            {% for message in messages %}
-                <li class="success">{{ message }}</li>
-            {% endfor %}
-        </ul>
+        <div class="mt-3">
+            <ul class="list-group">
+                {% for message in messages %}
+                    <li class="list-group-item success">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
         {% endif %}
-    </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

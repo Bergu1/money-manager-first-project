@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'account',
     'manager',
     'moneybox',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
