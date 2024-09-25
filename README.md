@@ -1,5 +1,5 @@
 # Money Manager
-Money Manager is a web application that helps users oversee their monthly budget and manage expenses and savings in different currencies.
+Money Manager is a web application that helps users oversee their monthly budget, manage expenses and savings in different currencies.
 
 ## Features
 * **Registration and Login:** Users can register, log in, and reset their password via email.
